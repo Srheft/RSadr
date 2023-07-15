@@ -472,4 +472,33 @@ def getMTF(lsf,timecode, sca_ch, edgeside, plot = False):
 
     return mtf, mtfFreq, mtfVsFreq, summary, nyquistFreq, mtfNy
     
+#-------------------------------------------------------------------
 
+def LinearX(x, x1, y1, x2, y2):
+    return (x - x1) * (y2 - y1) / (x2 - x1) + y1
+
+#-------------------------------------------------------------------
+
+def find_root(X, Y, y0):
+    """
+    X and Y are lists, where Y=F(X)
+    returns:
+        list of roots: X_root
+    y0 is the value for which X_root[..] = F(y0)
+    """
+    
+    X_root = []
+    for j in range(1, len(Y)):
+        if (y0 >= Y[j - 1] and y0 < Y[j]) or (y0 <= Y[j - 1] and y0 > Y[j]):
+            X_root.append(LinearX(y0, Y[j - 1], X[j - 1], Y[j], X[j]))
+    
+    return X_root
+
+#-------------------------------------------------------------------
+
+def slope_finder(X, Y):
+    r,l = find_root(X, Y, 0.6)[0],find_root(X, Y, 0.4)[0]
+    s = 0.2/(r-l)
+    print('--------------------------------------')
+    print('Edge Slope (100m pixel size) = {} 1/100m'.format(s))
+    print('--------------------------------------')
